@@ -24,10 +24,10 @@ if os.getcwd() not in sys.path: sys.path.append(os.getcwd())
 from fields import init_fields,gaussian_envelope
 import plasma, envelope
 
-import stencils.cyl as cyl
-
+from stencils.cyl import *
 from integrators import *
 from plot import *
+from envelope import S,MI
 
 def init(current_config, globals):
 	root = {}

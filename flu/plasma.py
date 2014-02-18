@@ -1,5 +1,5 @@
 import numpy as np
-from flu.stencils.cyl import *
+from stencils.cyl import *
 from fields import Sim
 
 #profilo densita'

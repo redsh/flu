@@ -1,18 +1,18 @@
 import numpy as np
-from flu.stencils.cyl import *
+from stencils.cyl import *
 
 def Norm(a,b):
     return np.sqrt( np.max( (a-b)*(a-b)  ) )
 
 def Error(x,b):
-    return Norm(k0_kp*k0_kp*x + diff_z_2(x), b)
+    return Norm(cfg.k0_kp*cfg.k0_kp*x + diff_z_2(x), b)
 
 def S(A,xi):
     return -0.5*lapl_r(A)-0.5*xi*A
 
 def Jacobi(x,b):
-    #print k0_kp*k0_kp,2.0/(dz*dz)
-    D  = k0_kp*k0_kp - 2.0/(dz*dz)
+    #print cfg.k0_kp*cfg.k0_kp,2.0/(dz*dz)
+    D  = cfg.k0_kp*cfg.k0_kp - 2.0/(dz*dz)
     Rx = np.roll(x,-1,ax_z)/(dz*dz) + np.roll(x,1,ax_z)/(dz*dz)
     return (b-Rx)/D
 

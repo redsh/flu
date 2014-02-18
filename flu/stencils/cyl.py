@@ -1,8 +1,6 @@
 import numpy as np
-from ..fields import *
-
-
 # z derivs
+
 
 def diff_z_1(a):
 	ap = np.roll(a, -1, ax_z)
