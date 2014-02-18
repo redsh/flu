@@ -1,8 +1,6 @@
 import math
 import numpy as np
 
-current_config = 123
-
 class Config(object):
 	def __init__(self):
 		pass
@@ -22,8 +20,9 @@ class Config(object):
 
 		self.dt = 0.2*self.dz
 		#self.nz,self.nr=self.Lz/self.dz,self.Lr/self.dz
-		global current_config
-		current_config = self
+		#global current_config
+		#print 'setting!!!>>>',self.a0
+		#current_config = self
 		
 def sample_config():
 	r = Config()
@@ -39,6 +38,9 @@ def sample_config():
 	r.k0 = 2.0*math.pi/r.l0
 	r.a0 = 1.0
 	r.dt = r.dz*0.25
+
+	r.T0 = 0.
+	r.smax = 100.
 
 	return r
 
@@ -67,5 +69,7 @@ def envelope_config():
 	r.nz,r.nr=r.Lz/r.dz,r.Lr/r.dz
 
 	return r
+
+
 
 

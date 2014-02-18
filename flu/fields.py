@@ -1,48 +1,99 @@
+import copy,math
 import numpy as np
-from configs import current_config
-from setup import *
 
 #if current_config.geometry == 'cyl':
-ax_z,ax_r = (1,0)
 
-cfg = current_config
-z,r = current_config.zr()
-dz,dr = cfg.dz,cfg.dr
-dt = cfg.dt
+class Sim(object):
+	def __init__(self):
+		pass
 
-one__r = r.copy()
-print 'fields dr',dr
+	def _unpack(self,glob):
+		for p in dir(self):
+			if p[0] != '_':
+				glob[p] = getattr(self,p)
+				#print p 
 
-for i in range(one__r.shape[0]):
-	if i != 0:
-		one__r[i,:] = 1.0/(dr*i)
+	#def pack(self, locs): #TODO can be static
+	#	r = Sim()
+	#	for p in locs.keys():
+	#		if p[0] != '_':
+	#			setattr(r,p,locs[p])
+	#			print 'packing'+p
+	#	return r
 
-dd  = (current_config.dr,current_config.dz)
-shape = z.shape
+	def __mul__(self,b):
+		ret = Sim()
+			
+		if isinstance(b,Sim):
+			for k in self.__dict__:
+				if hasattr(b,k):
+					setattr(ret,k,  getattr(self,k)*getattr(b,k) )
+		else:
+			for k in self.__dict__:
+				setattr(ret,k,  getattr(self,k)*b )
 
-#status
-#e.m.
+		return ret
 
-s0 = Sim()
+	def __add__(self,b):
+		ret = Sim()
+			
+		if isinstance(b,Sim):
+			for k in self.__dict__:
+				if hasattr(b,k):
+					setattr(ret,k,  getattr(self,k)+getattr(b,k) )
+		else:
+			for k in self.__dict__:
+				setattr(ret,k,  getattr(self,k)+b )
 
-s0.Ez = np.zeros(shape)
-s0.Er = np.zeros(shape)
-s0.Bp = np.zeros(shape)
-
-#plasma: fluid
-#s0.rho = np.zeros(shape)
-s0.ruz = np.zeros(shape)
-s0.rur = np.zeros(shape)
-
-#envelope
-s0.Ar = np.zeros(shape)
-s0.Ai = np.zeros(shape)
-#s0.A2 = np.zeros(shape)
+		return ret
 
 
-#init: envelope
+def init_fields(current_config, globals):
+	ax_z,ax_r = (1,0)
 
-zl0 = 0
+	cfg = current_config
+	z,r = cfg.zr()
+	dz,dr = cfg.dz,cfg.dr
+	dt = cfg.dt
+
+	one__r = r.copy()
+	print 'fields dr',dr
+
+	for i in range(one__r.shape[0]):
+		if i != 0:
+			one__r[i,:] = 1.0/(dr*i)
+
+	dd  = (cfg.dr,cfg.dz)
+	shape = z.shape
+
+	#status
+	#e.m.
+
+	s0 = Sim()
+
+	s0.Ez = np.zeros(shape)
+	s0.Er = np.zeros(shape)
+	s0.Bp = np.zeros(shape)
+
+	#plasma: fluid
+	#s0.rho = np.zeros(shape)
+	s0.ruz = np.zeros(shape)
+	s0.rur = np.zeros(shape)
+
+	#envelope
+	s0.Ar = np.zeros(shape)
+	s0.Ai = np.zeros(shape)
+	#s0.A2 = np.zeros(shape)
+
+	#init: envelope
+	zl0 = 0
+
+	#cfg.z,cfg.r = z,r
+
+	L = copy.copy(locals())
+	for l in L:
+		if l != 'current_config' and l != 'globals':
+			globals[l] = locals()[l]
 
 def gaussian_envelope(t):
 	gamma_g=cfg.k0_kp;
@@ -62,13 +113,7 @@ def cos2_envelope(t):
 	ret[ np.abs(buf) > .99995 ] = 0.0
 
 	return ret
-	#retur
 
-	#s0.Ar = cfg.a0*np.exp(-((z-zl0)*(z-zl0))/(cfg.L*cfg.L))*np.exp(-r*r/(cfg.W*cfg.W))
-
-#from stencils.cyl import *
-
-from plot import *
 
 
 
