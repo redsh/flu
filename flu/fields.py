@@ -11,15 +11,6 @@ class Sim(object):
 		for p in dir(self):
 			if p[0] != '_':
 				glob[p] = getattr(self,p)
-				#print p 
-
-	#def pack(self, locs): #TODO can be static
-	#	r = Sim()
-	#	for p in locs.keys():
-	#		if p[0] != '_':
-	#			setattr(r,p,locs[p])
-	#			print 'packing'+p
-	#	return r
 
 	def __mul__(self,b):
 		ret = Sim()
@@ -53,6 +44,9 @@ def init_fields(current_config, globals):
 
 	cfg = current_config
 	z,r = cfg.zr()
+	zmin = z.min()
+	zmax = z.max()
+
 	dz,dr = cfg.dz,cfg.dr
 	dt = cfg.dt
 

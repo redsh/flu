@@ -2,10 +2,6 @@ import numpy as np
 from stencils.cyl import *
 from fields import Sim
 
-#profilo densita'
-def ltprofile(t):
-    return 1.0
-
 def deriv(t,s):
     #boundary: r
     if 1:
@@ -46,6 +42,11 @@ def deriv(t,s):
     bz,br  = uz/gamma, ur/gamma
     jz,jr = -ruz/gamma, -rur/gamma
     
+    for P in s.plasmas:
+        ds_dt,pjz,pjr = P.deriv(s)
+        jz += pjz
+        jr += pjr
+
     ds = Sim()
     
     ds.Ez =  diff_z_1_upwind(Ez   ) + div_r_filt(Bp,False) - jz
@@ -62,3 +63,7 @@ def deriv(t,s):
     #ds.rho = np.sqrt(1 + A2*0.5)
     
     return ds
+
+#profilo densita'
+def ltprofile(t):
+    return 1.0

@@ -60,3 +60,7 @@ def plot_sim(z,r,t,s):
 		['A','Ez','Er','Bp','rho'],str(t) )
 
 	show()
+
+def phys_imshow(z,r,a):
+	imshow(a, aspect='auto', extent=[z.min(), z.max(), r.max(), 0])
+		
