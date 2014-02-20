@@ -18,10 +18,17 @@ class Sim(object):
 		if isinstance(b,Sim):
 			for k in self.__dict__:
 				if hasattr(b,k):
-					setattr(ret,k,  getattr(self,k)*getattr(b,k) )
+					if type(getattr(self,k)) is list:
+						setattr(ret,k,  [ getattr(self,k)[i]*getattr(b,k)[i] for i in range(len(getattr(b,k))) ] )
+					else:
+						setattr(ret,k,  getattr(self,k)*getattr(b,k) )
 		else:
 			for k in self.__dict__:
-				setattr(ret,k,  getattr(self,k)*b )
+				if type(getattr(self,k)) is list: 
+					setattr(ret,k,  [getattr(self,k)[i]*b for i in range(len(getattr(self,k)))] )
+				else:
+					setattr(ret,k,  getattr(self,k)*b )
+
 
 		return ret
 
@@ -31,10 +38,18 @@ class Sim(object):
 		if isinstance(b,Sim):
 			for k in self.__dict__:
 				if hasattr(b,k):
-					setattr(ret,k,  getattr(self,k)+getattr(b,k) )
+					if type(getattr(self,k)) is list:
+						setattr(ret,k,  [ getattr(self,k)[i]+getattr(b,k)[i] for i in range(len(getattr(b,k))) ] )
+					else:
+						setattr(ret,k,  getattr(self,k)+getattr(b,k) )
 		else:
 			for k in self.__dict__:
-				setattr(ret,k,  getattr(self,k)+b )
+				if type(getattr(self,k)) is list: 
+					print k
+					setattr(ret,k,  [getattr(self,k)[i]+b for i in range(len(getattr(self,k)))] )
+				else:
+					setattr(ret,k,  getattr(self,k)+b )
+
 
 		return ret
 
@@ -77,6 +92,8 @@ def init_fields(current_config, globals):
 	#envelope
 	s0.Ar = np.zeros(shape)
 	s0.Ai = np.zeros(shape)
+
+	s0.plasmas = []
 	#s0.A2 = np.zeros(shape)
 
 	#init: envelope

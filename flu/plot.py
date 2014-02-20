@@ -55,9 +55,30 @@ def plots_explicit(z_bounds,r_bounds,fields,names=[],supt=''):
 def plot_sim(z,r,t,s):
 	figure(figsize=(20,7))
 
-	plots(z,r, \
-		[np.sqrt(s.Ar*s.Ar + s.Ai*s.Ai), s.Ez, s.Er, s.Bp, s.rho], \
-		['A','Ez','Er','Bp','rho'],str(t) )
+	if len(s.plasmas)>0:
+		plots(z,r, \
+			[s.Ez, s.Er, s.Bp, s.rho], \
+			['Ez','Er','Bp','rho'],str(t) )
+
+		DD = cfg.debug.fields.__dict__
+		LL = cfg.debug.lineouts
+		keys = sorted(DD.keys())
+
+		F = [DD[k] for k in keys]
+		N = keys
+
+		for k in LL:
+			F += [np.array(LL[k])]
+			N += [k]
+
+		plots(z,r,F,N)
+
+
+
+	else:
+		plots(z,r, \
+			[np.sqrt(s.Ar*s.Ar + s.Ai*s.Ai), s.Ez, s.Er, s.Bp, s.rho], \
+			['A','Ez','Er','Bp','rho'],str(t) )
 
 	show()
 

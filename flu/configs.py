@@ -1,5 +1,13 @@
-import math
+import math,collections
 import numpy as np
+
+class Ext(object):
+	pass
+
+class Debug(object):
+	def __init__(self):
+		self.fields = Ext()
+		self.lineouts = collections.defaultdict(lambda:[])
 
 class Config(object):
 	def __init__(self):
@@ -19,6 +27,8 @@ class Config(object):
 		self.dr=(self.Lr)/(self.nr-1)
 
 		self.dt = 0.2*self.dz
+
+		self.debug = Debug()
 		#self.nz,self.nr=self.Lz/self.dz,self.Lr/self.dz
 		#global current_config
 		#print 'setting!!!>>>',self.a0

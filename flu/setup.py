@@ -22,15 +22,16 @@ import os,sys,json
 if os.getcwd() not in sys.path: sys.path.append(os.getcwd())
 
 from fields import init_fields,gaussian_envelope
-import plasma, envelope, bunch, plot
 
 from stencils.cyl import *
 from integrators import *
 from plot import *
 from envelope import S,MI
 
+import plasma, envelope, bunch, plot
+
 def init(current_config, globals):
-	root = {}
+	root = dict(cfg=current_config)
 	current_config.set()
 
 	init_fields(current_config,root)
