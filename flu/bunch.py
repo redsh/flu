@@ -25,11 +25,12 @@ def init_kinetic_bunch(s, N, mean, sigma, gamma, emit, q0):
 	delta  = (sigma[0]/dr,sigma[1]/dz)
 
 	rhob = rhob[center[0]:center[0]+delta[0], center[1]-delta[1]:center[1]+delta[1]]
-	data[_q, :] *= q0/data[_q, :].mean()
+	data[_q, :] *= q0/rhob.mean()
 
-	imshow(data[_q, :])
+	imshow(rhob*(q0/rhob.mean()))
 	colorbar()
 	show()
+	#fads
 	#fasdfds
 
 	#r0=data.rmin+j*data.dr;
