@@ -22,8 +22,10 @@ def deriv(t,s):
         s.Er [0,:]=0
         s.rur[0,:]=0
 
-        for P in s.plasmas:
-            P[bunch._r,:] = np.abs(P[bunch._r,:])
+        #for P in s.plasmas:
+        #    neg = P[bunch._r,:] < 0
+        #    P[bunch._r,neg]  = -P[bunch._r,neg]
+        #    P[bunch._ur,neg] = -P[bunch._ur,neg]
 
     s.rho = ltprofile(t)-diff_z_1_upwind(s.Ez)-div_r_filt(s.Er,False)
    
@@ -86,6 +88,7 @@ def deriv(t,s):
         cfg.debug.fields.z4_charge = cfg.debug.fields.z3_divE-cfg.debug.fields.z2_rhob
 
         cfg.debug.lineouts['charge_err'] += [ np.abs(cfg.debug.fields.z4_charge).max() ]
+        cfg.debug.lineouts['sigma'] += [ np.std(P[bunch._r,:])+np.std(P[bunch._z,:]) ]
         
         #plot.plot_field(z,r,pjz)
         #plot.show()
