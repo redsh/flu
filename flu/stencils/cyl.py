@@ -27,7 +27,8 @@ def diff_z_2(a):
 	#print dz,ax_z
 	ap = np.roll(a, -1, ax_z)
 	am = np.roll(a,  1, ax_z)
-
+	##print 'dz1=',dz
+    
 	return (ap - 2.0*a + am)/(dz*dz)
 
 

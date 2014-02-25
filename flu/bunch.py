@@ -8,12 +8,18 @@ shape_order = 0
 
 def init_kinetic_bunch(s, N, mean, sigma, gamma, emit, q0):
 	data = np.zeros((6,N))
-	data[_z, :] = np.random.normal(loc=mean[1],scale=sigma[1],size=(N))
-	data[_r, :] = np.random.normal(loc=mean[0],scale=sigma[0],size=(N))
 	
-	data[_uz, :] = gamma
+	data[_z, :] = np.random.normal(loc=mean[1],scale=sigma[1],size=(N))
+
+	y = np.random.normal(loc=mean[0],scale=sigma[0],size=(N))
+	z = np.random.normal(loc=mean[0],scale=sigma[0],size=(N))
+	data[_r, :] = np.sqrt(y*y+z*z)
+	data[_r, :] = np.random.normal(loc=mean[0],scale=sigma[0],size=(N))
+
+	data[_uz, :] = gamma*np.sqrt(1.0-1.0/(gamma*gamma))
 	#TODO mettere emittanza bene
-	data[_ur, :] = np.random.normal(loc=0, scale=gamma*emit,size=(N))
+	if emit > 0:
+		data[_ur, :] = np.random.normal(loc=0, scale=gamma*emit,size=(N))
 
 	data[_q, :] = np.abs(data[_r, :])/dr+0.5
 	data[_m, :] = 1.
@@ -22,7 +28,7 @@ def init_kinetic_bunch(s, N, mean, sigma, gamma, emit, q0):
 
 	rhob   = deposition(data,s,[ data[_q,:] ])[0]
 	center = (mean[0]/dr,(mean[1]-zmin)/dz)
-	delta  = (sigma[0]/dr,sigma[1]/dz)
+	delta  = (sigma[0]/dr*0.5,sigma[1]/dz*0.5)
 
 	rhob = rhob[center[0]:center[0]+delta[0], center[1]-delta[1]:center[1]+delta[1]]
 	data[_q, :] *= q0/rhob.mean()
@@ -88,7 +94,6 @@ def interpolate(data, fields):
 
 
 	return ret
-
 
 def deposition(data, s, values):
 	ret = []
@@ -159,7 +164,7 @@ def deriv(data, s):
 	beta_z = uz/gamma
 	beta_r = ur/gamma
 
-	Jz, Jr = deposition(data, s,[q*beta_z,q*beta_r])
+	Jz, Jr = deposition(data, s,[-q*beta_z, -q*beta_r*sgn])
 	#indici su griglia
 
 	ds_dt = np.zeros( (6, N) )
@@ -170,11 +175,64 @@ def deriv(data, s):
 	ds_dt[_uz, :] = -Ez_sampled - beta_r*Bp_sampled
 	ds_dt[_ur, :] = -Er_sampled + beta_z*Bp_sampled
 
-	#ds_dt = np.zeros( (6, N) )
 	#if cfg.bunch_adiabatic_T < 0.999:
 	if 1:
 		ds_dt *= 0.
 
 	return ds_dt,Jz,Jr
+
+
+## field initialization
+import poisson
+
+def rho(data,s):
+	return deposition(data,s,[data[_q,:]])[0]
+
+def initial_fields_rho(rho_,gamma,s,convergence=1e-4):
+	solver = poisson.PoissonSolver2DCylGamma(gamma,dr,dz)
+	phi = solver.cycle(None,rho_,callback=None,max_iters=10000,convergence=convergence)
+	
+	figure(figsize=(18,5))
+	cols = 7
+	plot_field(z,r,phi,'phi',x=1,columns=cols)
+	
+
+	for f in [phi]:
+		f[:,-1] = 0.
+		f[:,-2] = 0.
+
+	beta = np.sqrt(1.0-1.0/(gamma*gamma))
+
+	Ez = -diff_z_1(phi)*(1.0/(gamma*gamma))
+	Er = -diff_r_1(phi)
+	Bphi = Er*beta
+
+	divE = diff_z_1(Ez)+div_r(Er,False)
+
+	plot_field(z,r,Ez,'Ez',x=2,columns=cols)
+
+	plot_field(z,r,Er,'Er',x=3,columns=cols)
+
+	plot_field(z,r,Bphi,'Bp',x=4,columns=cols)	
+
+	plot_field(z,r,divE+rho_,'divE-rho',x=5,columns=cols)
+
+	plot_field(z,r,divE,'divE',x=6,columns=cols)
+
+	plot_field(z,r,rho_,'rho',x=7,columns=cols)
+
+	show()
+
+
+	#fdasfds
+
+	return Ez,Er,Bphi
+	
+
+def initial_fields(b,s):
+	return initial_fields_rho(rho(b,s),s)
+
+
+
 
 

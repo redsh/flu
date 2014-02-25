@@ -11,6 +11,10 @@ class Debug(object):
 
 class Config(object):
 	def __init__(self):
+		self.Lz = 20.
+		self.Lr = 20.
+		self.dz = 0.1
+		self.dr = 0.1
 		pass
 
 	def zr(self):

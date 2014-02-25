@@ -64,41 +64,44 @@ def deriv(t,s):
         if cfg.bunch_current_factor < 0.9999:
             jz *= epsilon
             jr *= epsilon
-        #print epsilon
+    #    #print epsilon
     
-    ds.plasmas = []
+    if hasattr(cfg,'bunch_corrective_jz'):
+        jz = cfg.bunch_corrective_jz
+        jr = cfg.bunch_corrective_jr
 
-    for P in s.plasmas:
-        ds_dt,pjz,pjr = bunch.deriv(P,s)
+        ds.plasmas = [0. for P in s.plasmas]
+    else:
+        ds.plasmas = []
 
-        if hasattr(cfg,'bunch_current_factor'):
-            pjz *= cfg.bunch_current_factor
-            pjr *= cfg.bunch_current_factor
-            #print cfg.bunch_current_factor
+        for P in s.plasmas:
+            ds_dt,pjz,pjr = bunch.deriv(P,s)
 
-        jz += pjz
-        jr += pjr
+            #if hasattr(cfg,'bunch_current_factor'):
+            #    pjz *= cfg.bunch_current_factor
+            #    pjr *= cfg.bunch_current_factor
+                #print cfg.bunch_current_factor
 
+            jz += pjz
+            jr += pjr
 
-        cfg.debug.fields.z0_Jzb = pjz
-        cfg.debug.fields.z1_Jrb = pjr
-        cfg.debug.fields.z2_rhob = bunch.deposition(P,s,[P[bunch._q,:]])[0]
-
-        cfg.debug.fields.z3_divE = diff_z_1_upwind(s.Ez)+div_r_filt(s.Er,False)
-        cfg.debug.fields.z4_charge = cfg.debug.fields.z3_divE-cfg.debug.fields.z2_rhob
-
-        cfg.debug.lineouts['charge_err'] += [ np.abs(cfg.debug.fields.z4_charge).max() ]
-        cfg.debug.lineouts['sigma'] += [ np.std(P[bunch._r,:])+np.std(P[bunch._z,:]) ]
+            ds.plasmas += [ds_dt]
         
-        #plot.plot_field(z,r,pjz)
-        #plot.show()
-        #plot.plot_field(z,r,pjr)
-        #plot.show()
-        
+            cfg.debug.fields.z0_Jzb = jz
+            cfg.debug.fields.z1_Jrb = jr
+            cfg.debug.fields.z2_rhob = bunch.deposition(P,s,[P[bunch._q,:]])[0]
 
-        ds.plasmas += [ds_dt]
+            cfg.debug.fields.z3_divE = diff_z_1_upwind(s.Ez)+div_r_filt(s.Er,False)
+            cfg.debug.fields.z4_charge = cfg.debug.fields.z3_divE-cfg.debug.fields.z2_rhob
+
+            cfg.debug.lineouts['charge_err'] += [ np.abs(cfg.debug.fields.z4_charge).max() ]
+            cfg.debug.lineouts['sigma'] += [ np.std(P[bunch._r,:])+np.std(P[bunch._z,:]) ]
+            #plot.plot_field(z,r,pjz)
+            #plot.show()
+            #plot.plot_field(z,r,pjr)
+            #plot.show()
+
     
-        
     ds.Ez =  diff_z_1_upwind(Ez   ) + div_r_filt(Bp,False) - jz
     ds.Er =  diff_z_1_upwind(Er-Bp)                        - jr
     ds.Bp = -diff_z_1_upwind(Er-Bp) + diff_r_1(Ez)
@@ -111,6 +114,9 @@ def deriv(t,s):
     ds.rho = 0
     ds.gamma = 0
 
+    if hasattr(cfg,'bunch_current_factor'):
+        ds.ruz *= cfg.epsilon
+        ds.rur *= cfg.epsilon
     #ds.rho = np.sqrt(1 + A2*0.5)
     
     return ds

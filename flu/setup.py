@@ -28,7 +28,7 @@ from integrators import *
 from plot import *
 from envelope import S,MI
 
-import plasma, envelope, bunch, plot
+import plasma, envelope, bunch, plot, jacobi, poisson
 
 def init(current_config, globals):
 	root = dict(cfg=current_config)
@@ -44,6 +44,8 @@ def init(current_config, globals):
 	setup_module(plasma,root)
 	setup_module(bunch,root)
 	setup_module(plot,root)
+	setup_module(jacobi,root)
+	setup_module(poisson,root)
 
 	_unpack(current_config, globals)
 	_unpack_dict(root,globals) 

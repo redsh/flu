@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from matplotlib.pyplot import *
+import matplotlib.pyplot as plt
 
 def plot_field(z,r,a,name='',x=0,columns=1,do_lineout=True):
 
